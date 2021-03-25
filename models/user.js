@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema(
@@ -7,12 +7,15 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    officerId: {
+      type: String,
+    },
     password: {
       type: String,
     },
     role: {
       type: String,
-      default: 'admin',
+      default: "officer",
     },
     name: {
       type: String,
@@ -22,7 +25,7 @@ const userSchema = new Schema(
     },
     isActive: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     deleteAt: {
       type: Date,
@@ -31,11 +34,14 @@ const userSchema = new Schema(
     bio: {
       type: String,
     },
+    address: {
+      type: String,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
 module.exports = User;

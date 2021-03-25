@@ -44,22 +44,23 @@ module.exports = {
 
   getPatients: async (req, res) => {
     const { pageSize, currentPage } = req.params;
-    const { search } = req.query;
+    const { search, orderBy } = req.query;
     const skip =
       Number(currentPage) === 1
         ? 0
         : (Number(currentPage) - 1) * Number(pageSize);
-
+    const order = orderBy === "newest" ? "DESC" : "ASC";
     var findCondition = { deleteAt: null };
     if (search) {
       findCondition = {
         deleteAt: null,
-        type: { $regex: new RegExp(search, "i") },
+        name: { $regex: new RegExp(search, "i") },
       };
     }
     try {
       const response = await Patient.find(findCondition)
-        .sort([["createdAt", "DESC"]])
+        .populate("symptomsId inputBy")
+        .sort([["createdAt", order]])
         .limit(Number(pageSize) * 1)
         .skip(skip);
       const count = await Patient.countDocuments(findCondition);
@@ -82,6 +83,23 @@ module.exports = {
       const response = await Patient.findById({
         _id,
       });
+      res.status(200).json(response);
+    } catch (error) {
+      res.status(500).json(response);
+    }
+  },
+
+  deletePatient: async (req, res) => {
+    const { _id } = req.params;
+    try {
+      const response = await Patient.findByIdAndUpdate(
+        {
+          _id,
+        },
+        {
+          deleteAt: new Date(),
+        }
+      );
       res.status(200).json(response);
     } catch (error) {
       res.status(500).json(response);

@@ -1,4 +1,4 @@
-const Symptoms = require('../models/Symptoms');
+const Symptoms = require("../models/Symptoms");
 
 module.exports = {
   addNew: async (req, res) => {
@@ -16,7 +16,7 @@ module.exports = {
         res.status(201).json(response);
       } else {
         res.status(409).json({
-          msg: 'kode gejala sudah ada',
+          msg: "kode gejala sudah ada",
         });
       }
     } catch (error) {
@@ -26,7 +26,8 @@ module.exports = {
 
   getAllPagination: async (req, res) => {
     const { pageSize, currentPage } = req.params;
-    const { search } = req.query;
+    const { search, orderBy } = req.query;
+    const order = orderBy === "newest" ? "DESC" : "ASC";
     const skip =
       Number(currentPage) === 1
         ? 0
@@ -36,12 +37,12 @@ module.exports = {
     if (search) {
       findCondition = {
         deleteAt: null,
-        type: { $regex: new RegExp(search, 'i') },
+        name: { $regex: new RegExp(search, "i") },
       };
     }
     try {
       const response = await Symptoms.find(findCondition)
-        .sort([['createdAt', 'DESC']])
+        .sort([["createdAt", order]])
         .limit(Number(pageSize) * 1)
         .skip(skip);
       const count = await Symptoms.countDocuments(findCondition);
@@ -94,7 +95,7 @@ module.exports = {
         res.status(200).json(response);
       } else {
         res.status(409).json({
-          msg: 'kode gejala sudah ada',
+          msg: "kode gejala sudah ada",
         });
       }
     } catch (error) {

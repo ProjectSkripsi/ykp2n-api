@@ -1,4 +1,5 @@
 const Symptoms = require("../models/Symptoms");
+const { isEmpty } = require("lodash");
 
 module.exports = {
   addNew: async (req, res) => {
@@ -72,13 +73,16 @@ module.exports = {
   },
 
   updateSymptoms: async (req, res) => {
-    const { _id, codes } = req.params;
-    const { name, description } = req.body;
+    const { _id } = req.params;
+    const { name, code, description } = req.body;
+
     try {
       const findCode = await Symptoms.find({
-        code: codes,
+        code,
+        deleteAt: null,
       });
-      if (findCode.length === 0) {
+
+      if (isEmpty(findCode)) {
         const response = await Symptoms.findByIdAndUpdate(
           {
             _id,
@@ -94,12 +98,30 @@ module.exports = {
         );
         res.status(200).json(response);
       } else {
-        res.status(409).json({
-          msg: "kode gejala sudah ada",
-        });
+        const symptomsId = findCode && findCode[0]._id;
+        if (symptomsId.toString() === _id) {
+          const response = await Symptoms.findByIdAndUpdate(
+            {
+              _id,
+            },
+            {
+              name,
+              code,
+              description,
+            },
+            {
+              returnOriginal: false,
+            }
+          );
+          res.status(200).json(response);
+        } else {
+          res.status(409).json({
+            msg: `kode gejala ${code} sudah ada`,
+          });
+        }
       }
     } catch (error) {
-      res.status(500).json(response);
+      res.status(500).json(error);
     }
   },
 

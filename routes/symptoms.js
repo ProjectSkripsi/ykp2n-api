@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 const {
   addNew,
@@ -7,14 +7,14 @@ const {
   updateSymptoms,
   getById,
   getAll,
-} = require("../controllers/symptomsController");
-const { isLogin } = require("../middlewares/auth");
+} = require('../controllers/symptomsController');
+const { isLogin } = require('../middlewares/auth');
 
-router.get("/all", getAll);
-router.post("/", isLogin, addNew);
-router.get("/:pageSize/:currentPage", isLogin, getAllPagination);
-router.delete("/:_id", isLogin, deleteSymptoms);
-router.put("/:_id", isLogin, updateSymptoms);
-router.get("/:_id", isLogin, getById);
+router.get('/all', getAll);
+router.post('/', isLogin, addNew);
+router.get('/:pageSize/:currentPage', isLogin, getAllPagination);
+router.delete('/:_id', isLogin, deleteSymptoms);
+router.put('/:codes', isLogin, updateSymptoms);
+router.get('/:_id', isLogin, getById);
 
 module.exports = router;

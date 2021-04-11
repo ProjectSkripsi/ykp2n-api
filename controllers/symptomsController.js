@@ -6,6 +6,7 @@ module.exports = {
     const { name, code, description, diagnose, bobot } = req.body;
     try {
       const findCode = await Symptoms.find({
+        deleteAt: null,
         code,
       });
       if (findCode.length === 0) {
@@ -77,9 +78,10 @@ module.exports = {
   updateSymptoms: async (req, res) => {
     const { _id, codes } = req.params;
     const { name, description, diagnose, bobot } = req.body;
+
     try {
       const findCode = await Symptoms.find({
-        code,
+        code: codes,
         deleteAt: null,
       });
 
@@ -99,32 +101,38 @@ module.exports = {
             returnOriginal: false,
           }
         );
+
         res.status(200).json(response);
       } else {
-        const symptomsId = findCode && findCode[0]._id;
-        if (symptomsId.toString() === _id) {
-          const response = await Symptoms.findByIdAndUpdate(
-            {
-              _id,
-            },
-            {
-              name,
-              code,
-              description,
-            },
-            {
-              returnOriginal: false,
-            }
-          );
-          res.status(200).json(response);
-        } else {
-          res.status(409).json({
-            msg: `kode gejala ${code} sudah ada`,
-          });
-        }
+        res.status(409).json({
+          msg: `kode gejala ${codes} sudah ada`,
+        });
+        // console.log('masuk else');
+        // const symptomsId = findCode && findCode[0]._id;
+        // if (symptomsId.toString() === _id) {
+        //   const response = await Symptoms.findOneAndUpdate(
+        //     {
+        //       code: codes,
+        //     },
+        //     {
+        //       name,
+        //       code: codes,
+        //       description,
+        //       diagnose,
+        //       bobot,
+        //     },
+        //     {
+        //       returnOriginal: false,
+        //     }
+        //   );
+        //   res.status(200).json(response);
+        // } else {
+        //   res.status(409).json({
+        //     msg: `kode gejala ${codes} sudah ada`,
+        //   });
+        // }
       }
     } catch (error) {
-      console.log(error);
       res.status(500).json(error);
     }
   },

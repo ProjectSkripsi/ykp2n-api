@@ -1,9 +1,9 @@
-const Symptoms = require("../models/Symptoms");
-const { isEmpty } = require("lodash");
+const Symptoms = require('../models/Symptoms');
+const { isEmpty } = require('lodash');
 
 module.exports = {
   addNew: async (req, res) => {
-    const { name, code, description } = req.body;
+    const { name, code, description, diagnose, bobot } = req.body;
     try {
       const findCode = await Symptoms.find({
         code,
@@ -12,12 +12,14 @@ module.exports = {
         const response = await Symptoms.create({
           name,
           code,
+          diagnose,
+          bobot,
           description,
         });
         res.status(201).json(response);
       } else {
         res.status(409).json({
-          msg: "kode gejala sudah ada",
+          msg: 'kode gejala sudah ada',
         });
       }
     } catch (error) {
@@ -28,7 +30,7 @@ module.exports = {
   getAllPagination: async (req, res) => {
     const { pageSize, currentPage } = req.params;
     const { search, orderBy } = req.query;
-    const order = orderBy === "newest" ? "DESC" : "ASC";
+    const order = orderBy === 'newest' ? 'DESC' : 'ASC';
     const skip =
       Number(currentPage) === 1
         ? 0
@@ -38,12 +40,12 @@ module.exports = {
     if (search) {
       findCondition = {
         deleteAt: null,
-        name: { $regex: new RegExp(search, "i") },
+        name: { $regex: new RegExp(search, 'i') },
       };
     }
     try {
       const response = await Symptoms.find(findCondition)
-        .sort([["createdAt", order]])
+        .sort([['createdAt', order]])
         .limit(Number(pageSize) * 1)
         .skip(skip);
       const count = await Symptoms.countDocuments(findCondition);
@@ -73,24 +75,25 @@ module.exports = {
   },
 
   updateSymptoms: async (req, res) => {
-    const { _id } = req.params;
-    const { name, code, description } = req.body;
-
+    const { _id, codes } = req.params;
+    const { name, description, diagnose, bobot } = req.body;
     try {
       const findCode = await Symptoms.find({
         code,
         deleteAt: null,
       });
 
-      if (isEmpty(findCode)) {
-        const response = await Symptoms.findByIdAndUpdate(
+      if (findCode.length === 1) {
+        const response = await Symptoms.findOneAndUpdate(
           {
-            _id,
+            code: codes,
           },
           {
             name,
-            code,
+            code: codes,
             description,
+            diagnose,
+            bobot,
           },
           {
             returnOriginal: false,
@@ -121,6 +124,7 @@ module.exports = {
         }
       }
     } catch (error) {
+      console.log(error);
       res.status(500).json(error);
     }
   },

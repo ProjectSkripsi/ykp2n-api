@@ -85,7 +85,20 @@ module.exports = {
       });
       res.status(200).json(response);
     } catch (error) {
-      res.status(500).json(response);
+      res.status(500).json(error);
+    }
+  },
+
+  deletePatient: async (req, res) => {
+    const { _id } = req.params;
+    console.log(_id);
+    try {
+      const response = await Patient.findByIdAndRemove({
+        _id,
+      });
+      res.status(200).json(response);
+    } catch (error) {
+      res.status(500).json(error);
     }
   },
 

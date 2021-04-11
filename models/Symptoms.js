@@ -10,6 +10,12 @@ const symptomsSchema = new Schema(
     code: {
       type: String,
     },
+    diagnose: {
+      type: String,
+    },
+    bobot: {
+      type: String,
+    },
     description: {
       type: String,
     },

@@ -23,15 +23,15 @@ const convert = (type) => {
 const getClassification = (code) => {
   let temp = '';
   if (code === 1) {
-    temp = 'Putaw (Opioid)';
+    temp = 'Positif Pengguna Narkoba Jenis Putaw (Opioid)';
   } else if (code === 2) {
-    temp = 'Sabu (Amfetamin)';
+    temp = 'Positif Pengguna Narkoba Jenis Sabu (Amfetamin)';
   } else if (code === 3) {
-    temp = 'Ganja (Halusinogen)';
+    temp = 'Positif Pengguna Narkoba Jenis Ganja (Halusinogen)';
   } else if (code === 4) {
-    temp = 'Alkohol (Depression)';
+    temp = 'Positif Alkohollic';
   } else if (code === 0) {
-    temp = 'Tidak terdeteksi sebagai pengguna narkoba dan alkohol';
+    temp = 'Negatif';
   }
   return temp;
 };

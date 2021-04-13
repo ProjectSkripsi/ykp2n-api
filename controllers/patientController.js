@@ -1,6 +1,8 @@
-const Patient = require("../models/Patient");
-const { getClassification } = require("../helpers/constant");
-const moment = require("moment");
+const Patient = require('../models/Patient');
+const Symptoms = require('../models/Symptoms');
+const { getClassification } = require('../helpers/constant');
+const { sumType, sumDiagnose } = require('../helpers/utils');
+const moment = require('moment');
 
 module.exports = {
   addPatient: async (req, res) => {
@@ -14,10 +16,37 @@ module.exports = {
       symptomsId,
     } = req.body;
 
-    const randomClas = Math.floor(Math.random() * 4) + 1;
-    const countGejala = symptomsId.length <= 10 ? 0 : randomClas;
-    const resultCoders = countGejala === 0 ? 0 : 1;
-    const age = moment().diff(dateBirth, "years");
+    const age = moment().diff(dateBirth, 'years');
+    const gejala = await Symptoms.find({
+      deleteAt: null,
+    });
+
+    const r = gejala.filter((elem) =>
+      symptomsId.find((id) => {
+        const symId = elem._id.toString();
+        return symId === id;
+      })
+    );
+
+    const putaw = r.filter((item) => item.diagnose === 'Putaw');
+    const sabu = r.filter((item) => item.diagnose === 'Sabu');
+    const ganja = r.filter((item) => item.diagnose === 'Ganja');
+    const alkohol = r.filter((item) => item.diagnose === 'Alkohol');
+
+    const accSympmtoms = [
+      putaw.length,
+      sabu.length,
+      ganja.length,
+      alkohol.length,
+    ];
+    const dataSym = [putaw, sabu, ganja, alkohol];
+    let i = accSympmtoms.indexOf(Math.max(...accSympmtoms));
+    console.log(accSympmtoms);
+    const accumBobot = await sumType(
+      i === 0 ? 'Putaw' : i === 1 ? 'Sabu' : i === 2 ? 'Ganja' : 'Alkohol'
+    );
+    const totalBobotInput = sumDiagnose(dataSym[i]);
+    const result = totalBobotInput > accumBobot ? i : 4;
 
     try {
       const response = await Patient.create({
@@ -29,11 +58,16 @@ module.exports = {
         dateBirth,
         symptomsId,
         age,
-        resultCode: resultCoders,
-        result: resultCoders === 0 ? "Positif" : "Negatif",
-        criteriaCode: countGejala,
-        criteriaStatus: getClassification(countGejala),
+        resultCode: result,
+        result: result === 0 ? 'Negatif' : 'Positif',
+        criteriaCode: result,
+        criteriaStatus: getClassification(result),
         inputBy: req.decoded.id,
+        analyse: {
+          data: dataSym[i],
+          totalBobotInput,
+          totalBobotTypeDiagnose: accumBobot * 2,
+        },
       });
       res.status(201).json(response);
     } catch (error) {
@@ -49,18 +83,18 @@ module.exports = {
       Number(currentPage) === 1
         ? 0
         : (Number(currentPage) - 1) * Number(pageSize);
-    const order = orderBy === "newest" ? "DESC" : "ASC";
+    const order = orderBy === 'newest' ? 'DESC' : 'ASC';
     var findCondition = { deleteAt: null };
     if (search) {
       findCondition = {
         deleteAt: null,
-        name: { $regex: new RegExp(search, "i") },
+        name: { $regex: new RegExp(search, 'i') },
       };
     }
     try {
       const response = await Patient.find(findCondition)
-        .populate("symptomsId inputBy")
-        .sort([["createdAt", order]])
+        .populate('symptomsId inputBy')
+        .sort([['createdAt', order]])
         .limit(Number(pageSize) * 1)
         .skip(skip);
       const count = await Patient.countDocuments(findCondition);

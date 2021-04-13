@@ -52,6 +52,7 @@ const patientSchema = new Schema(
       },
     ],
     deleteAt: { type: Date, default: null },
+    analyse: Object,
   },
   {
     timestamps: true,

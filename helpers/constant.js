@@ -22,15 +22,15 @@ const convert = (type) => {
 
 const getClassification = (code) => {
   let temp = '';
-  if (code === 1) {
+  if (code === 0) {
     temp = 'Positif Pengguna Narkoba Jenis Putaw (Opioid)';
-  } else if (code === 2) {
+  } else if (code === 1) {
     temp = 'Positif Pengguna Narkoba Jenis Sabu (Amfetamin)';
-  } else if (code === 3) {
+  } else if (code === 2) {
     temp = 'Positif Pengguna Narkoba Jenis Ganja (Halusinogen)';
-  } else if (code === 4) {
+  } else if (code === 3) {
     temp = 'Positif Alkohollic';
-  } else if (code === 0) {
+  } else if (code === 4) {
     temp = 'Negatif';
   }
   return temp;
